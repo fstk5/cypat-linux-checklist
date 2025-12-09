@@ -1,10 +1,16 @@
 # Linux Checklist
 
+### Other images for reference
+
 Training round READMEs and answer keys:
 - [CyPat 18 TR2 - Mint 21 README](https://www.uscyberpatriot.org/Pages/Readme/cp18_tr2_mint21_readme_93752gifdsw7ef.aspx)
 - [CyPat 18 TR2 - Mint 21 Answer Key](https://cp-18.s3.us-east-1.amazonaws.com/cp18_tr2/CP18_Mint21_Training2_Answer_Key.pdf)
 - [CyPat 18 TR2 - Ubuntu 22 README](https://www.uscyberpatriot.org/Pages/Readme/cp18_tr2_m_ubu22_readme_vw964wj88122.aspx)
-- [CyPat 18 TR2 - Ubuntu 22 Answer Key](https://www.uscyberpatriot.org/Pages/Readme/cp18_tr2_m_ubu22_readme_vw964wj88122.aspx)
+- [CyPat 18 TR2 - Ubuntu 22 Answer Key](https://cp-18.s3.us-east-1.amazonaws.com/cp18_tr2/CP18_Ubuntu22_Training2_Answer_Key.pdf)
+
+CyberPatriot competition image answer keys:
+- [CyPat 18 R1 Answer Key](https://github.com/fstk5/cypat-linux-checklist/blob/main/CP-18_Round_1_Answers_and_Vulnerabilities.pdf)
+- [CyPat 18 R2 Answer Key](https://github.com/fstk5/cypat-linux-checklist/blob/main/CP-18_Round_2_Answers_and_Vulnerabilities.pdf)
 
 ## Don’t paste any double quotes, single quotes are fine
 
