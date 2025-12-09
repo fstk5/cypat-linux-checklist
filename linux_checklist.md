@@ -74,4 +74,21 @@ If there is a game that <b>you know the name of</b>, you can:
 1. find the <b>package name</b> of the game. This is usually done using <code>apt list --installed | grep <i>name</i></code>
 2. uninstall the package using its <b>package name</b>, using </code>sudo apt uninstall <i>package name</i></code>
 
+### Check if UFW is set up
+This one is simple:
+1. Check if UFW is installed (run `ufw` in a terminal)
+2. If it isn't installed, run `sudo apt install ufw`
+3. Enable UFW by going into the system settings and enabling the firewall option.
 
+### Enable IPv4 TCP SYN cookies
+I'ma be honest, I got no clue what these things do. But, all you gotta do is open a superuser terminal session with `sudo -s` then run the code snippet below.
+`echo 'net.ipv4.tcp_syncookies = 1' >> /etc/sysctl.conf && sysctl -p && exit`
+```bash
+if [ -e /etc/sysctl.conf ]; then
+echo 'net.ipv4.tcp_syncookies = 1' | sudo tee -a /etc/sysctl.conf
+sysctl -p
+else
+sudo touch /etc/sysctl.d/99-syn-cookies.conf
+echo 'net.ipv4.tcp_syncookies = 1' | sudo tee /etc/sysctl.d/99-syn-cookies.conf
+fi
+```
