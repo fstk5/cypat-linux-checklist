@@ -11,20 +11,29 @@ Training round READMEs and answer keys:
 
 CyberPatriot competition image answer keys:
 
-- [CyPat 18 R1 Answer Key](https://github.com/fstk5/cypat-linux-checklist/blob/main/CP-18_Round_1_Answers_and_Vulnerabilities.pdf)
-- [CyPat 18 R2 Answer Key](https://github.com/fstk5/cypat-linux-checklist/blob/main/CP-18_Round_2_Answers_and_Vulnerabilities.pdf)
+- [CyPat 18 R1 Answer Key](https://github.com/fstk5/cypat-linux-checklist/blob/main/CP-18%20Round%201%20Answers%20and%20Vulnerabilities.pdf)
+- [CyPat 18 R2 Answer Key](https://github.com/fstk5/cypat-linux-checklist/blob/main/CP-18%20Round%202%20Answers%20and%20Vulnerabilities.pdf)
 
-### Account Related Actions (not scriptable)
+## User Account Actions
 
-- Check for unauthorized accounts
-- Check for unauthorized administrator accounts
-- Check insecure administrator passwords
-- Disable guest account
-- Create any new groups or accounts
-  - For new accounts, make sure to use `passwd -e username` to force a change on login.
+### Non-Scriptable actions
+
+- Check for unauthorized accounts and remove them using `sudo userdel username`
+- Check for unauthorized administrator accounts and strip admin permissions using one of two methods
+  1. Recommended: `sudo gpasswd -d username group` (if it's an unauthorized admin, use `sudo` as the group.)
+  2. Advanced: `sudo nano /etc/groups`
+- Check insecure administrator passwords and change them using `sudo passwd username`
+- Disable guest account (GUI)
+- Create any new groups or accounts with `sudo groupadd group` or `sudo useradd username`
+  - For new accounts, make sure to use `sudo passwd -e username` to force a change on login.
+  - Also, for adding a user to a group, use `sudo gpasswd -a username group`
 
 Weird subnote for this, there _could_ be a regular user with a sub-1000 UID, if this happens, you should go ask someone smart if this needs to be fixed.
 Many services use sub-1000 UIDs if they need a user account, so _unless_ its a regular user account (like one somebody actually uses), you're perfectly fine.
+
+### Scriptable actions
+
+
 
 ### Update all available packages through apt
 
@@ -68,11 +77,11 @@ Generally if the directory is owned by a specific user, it should probably be 70
 Essentially, Linux permissions are shown in one of two ways. There's <code>ls -l</code> syntax, and <code>chmod</code> syntax.
 <code>ls -l</code> syntax usually looks similar to something like this: <code>-rwxr-xr-x or lrwxrwxrwx</code>.
 It breaks down into 4 parts, which (from left to right) are owner indication, owner permissions, group permissions, and global permissions.
-<code>chmod</code> syntax usually looks something like 777 (LETS GO GAMBLING). 7 is the highest permission a user can have on a file.
+<code>chmod</code> syntax usually looks something like 777 (gambling??). 7 is the highest permission a user can have on a file.
 It means read (the r), write (the w), and excecute (the x). Like <code>ls -l</code>, it has a few parts, but this only has 3 parts.
 Owner permissions, group permissions, and global permissions.
-This is an extremely basic overview, you should probably go to <link>https://chmod-calculator.com/</link> to see how it actually works.
-To actually write permissions, it has to be in <code>chmod</code> syntax. To write new permissions (777 will be used as an example), you would write <code>chmod 777 <i>file</i></code>. (sudo may be required if you are not the owner of the file)
+This is an extremely basic overview, you should probably go to a <a href="https://chmod-calculator.com/">permissions calculator</a> to see how it actually works.
+To actually write permissions, it has to be in <code>chmod</code> syntax. To write new permissions (777 will be used as an example), you would write <code>chmod 777 "file"</code>. (sudo may be required if you are not the owner of the file)
 If you needed to write these changes to a folder <b>AND</b> all of its contents, you would add -R (R stands for recursive) in between the command and the permissiosn
 </details>
 
@@ -93,20 +102,59 @@ This one is simple:
 2. If it isn't installed, run `sudo apt install ufw`
 3. Enable UFW by going into the system settings and enabling the firewall option.
 
+## sysctl related changes
+
 ### Enable IPv4 TCP SYN cookies
 
 I'ma be honest, I got no clue what these things do. But, all you gotta do is open a superuser terminal session with `sudo -s` then run the code snippet below.
 
 ```bash
 if [ -e /etc/sysctl.conf ]; then
-echo 'net.ipv4.tcp_syncookies = 1' | sudo tee -a /etc/sysctl.conf
-sysctl -p
+echo 's/net.ipv4.tcp_syncookies=0/net.ipv4.tcp_syncookies = 1/g'
+sudo sysctl -p
 else
-sudo touch /etc/sysctl.d/99-syn-cookies.conf
+sudo touch /etc/sysctl.d/47-syn-cookies.conf
 if [ -e /etc/sysctl.d ]; then
 sudo mkdir /etc/sysctl.d
 fi
-echo 'net.ipv4.tcp_syncookies = 1' | sudo tee /etc/sysctl.d/99-syn-cookies.conf
-sysctl -p
+echo 'net.ipv4.tcp_syncookies = 1' | sudo tee /etc/sysctl.d/47-syn-cookies.conf
+sudo sysctl -p
 fi
 ```
+
+### Enable ASLR
+
+I still have no clue what this does lowk
+```bash
+if [ -e /etc/sysctl.conf ]; then
+sudo sed -i 's/kernel.randomize_va_space = 0/kernel.randomize_va_space = 2/g' /etc/sysctl.conf
+sudo sysctl -p
+else
+sudo touch /etc/sysctl.d/38-aslr.conf
+if [ -e /etc/sysctl.d ]; then
+sudo mkdir /etc/sysctl.d
+fi
+echo 'kernel.randomize_va_space = 2' | sudo tee /etc/sysctl.d/38-aslr.conf
+sudo sysctl -p
+fi
+```
+
+## Password actions
+
+### Ages
+
+For this one, you can simply use your favourite command line text editor for editing the file. This example will use nano since it's (in my opinion) the easiest for anyone to use.
+
+1. Use `sudo nano /etc/login.defs` to enter the file.
+2. Use Ctrl+F and type `PASS_MAX_DAYS`
+3. If the line is commented out with a #, remove the tag.
+4. Set the value to something reasonable, like 30 or 90 days.
+5. Use Ctrl+F again and now find `PASS_MIN_DAYS`
+6. Same as 3, uncomment the line.
+7. Set the value to 7 days.
+
+Also, DO NOT, and I mean **DO NOT** use `chage`. If you do and mess something up (like using it on your own account), you will be locked out, your password will not work, sudo will not work, and you will have to stop scoring. Basically if you do, you're screwed.
+
+### PAM Modules
+
+This section relates to things such as password lengths, remembering past passwords, disallowing empty passwords, and configuring account lockout policies.
