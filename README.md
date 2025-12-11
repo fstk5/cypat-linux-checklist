@@ -42,7 +42,7 @@ Many services use sub-1000 UIDs if they need a user account, so _unless_ its a r
 
 ### Search for unauthorized files
 
-- Before altering the directory or files, read the README file and/or forensic questions.
+Before altering the directory or files, read the README file and/or forensic questions.
 
 - When finding unauthorized files, the common directories to search are `/home` and `/srv`. The home directory holds all a users files (similar to C:\Users), and the srv directory holds all of an FTP server’s files.
 - To find any of these files, use the find command, with a pipe into grep with the thing you want to find (mp3, mp4, avi, mkv, etc.)
@@ -62,8 +62,8 @@ Usually, common services on Linux include:
 - cups (CUPS print server)
 - vnc !!COULD BE A DIFFERENT NAME!! (VNC server)
 - rdp !!COULD BE A DIFFERENT NAME!! (RDP server)
-  Unless it is explicitly said in the README that it’s allowed, disable it using systemctl
 
+Unless it is explicitly said in the README that it’s allowed, disable it using systemctl.
 An example command of using systemctl to disable the nginx service now would be `systemctl disable --now nginx`
 
 ### Check FTP permissions
@@ -100,7 +100,7 @@ This one is simple:
 
 1. Check if UFW is installed (run `ufw` in a terminal)
 2. If it isn't installed, run `sudo apt install ufw`
-3. Enable UFW by going into the system settings and enabling the firewall option.
+3. Enable UFW by going into the system settings and enabling the firewall option or running `sudo ufw enable`
 
 ## sysctl related changes
 
@@ -110,13 +110,15 @@ I'ma be honest, I got no clue what these things do. But, all you gotta do is ope
 
 ```bash
 if [ -e /etc/sysctl.conf ]; then
-echo 's/net.ipv4.tcp_syncookies=0/net.ipv4.tcp_syncookies = 1/g'
+sudo sed -i 's/^net.ipv4.tcp_syncookies.*/net.ipv4.tcp_syncookies = 1/' /etc/sysctl.conf
 sudo sysctl -p
 else
 sudo touch /etc/sysctl.d/47-syn-cookies.conf
 if [ -e /etc/sysctl.d ]; then
+echo 'net.ipv4.tcp_syncookies = 1' | sudo tee /etc/sysctl.d/47-syn-cookies.conf
+sudo sysctl -p
+else
 sudo mkdir /etc/sysctl.d
-fi
 echo 'net.ipv4.tcp_syncookies = 1' | sudo tee /etc/sysctl.d/47-syn-cookies.conf
 sudo sysctl -p
 fi
@@ -125,9 +127,10 @@ fi
 ### Enable ASLR
 
 I still have no clue what this does lowk
+
 ```bash
 if [ -e /etc/sysctl.conf ]; then
-sudo sed -i 's/kernel.randomize_va_space = 0/kernel.randomize_va_space = 2/g' /etc/sysctl.conf
+sudo sed -i 's/^kernel.randomize_va_space.*/kernel.randomize_va_space = 2/' /etc/sysctl.conf
 sudo sysctl -p
 else
 sudo touch /etc/sysctl.d/38-aslr.conf
@@ -152,6 +155,13 @@ For this one, you can simply use your favourite command line text editor for edi
 5. Use Ctrl+F again and now find `PASS_MIN_DAYS`
 6. Same as 3, uncomment the line.
 7. Set the value to 7 days.
+
+or lowk just paste the cool script thingy
+
+```bash
+sudo sed -i 's/^PASS_MAX_DAYS.*/PASS_MAX_DAYS = 30/' /etc/login.defs
+sudo sed -i 's/^PASS_MIN_DAYS.*/PASS_MIN_DAYS = 7/' /etc/login.defs
+```
 
 Also, DO NOT, and I mean **DO NOT** use `chage`. If you do and mess something up (like using it on your own account), you will be locked out, your password will not work, sudo will not work, and you will have to stop scoring. Basically if you do, you're screwed.
 
