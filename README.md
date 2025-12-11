@@ -18,13 +18,14 @@ CyberPatriot competition image answer keys:
 
 ### Non-Scriptable actions
 
-- Check for unauthorized accounts and remove them using `sudo userdel username`
+- Check for unauthorized accounts and remove them using `sudo userdel username` or the settings GUI.
 - Check for unauthorized administrator accounts and strip admin permissions using one of two methods
-  1. Recommended: `sudo gpasswd -d username group` (if it's an unauthorized admin, use `sudo` as the group.)
-  2. Advanced: `sudo nano /etc/groups`
-- Check insecure administrator passwords and change them using `sudo passwd username`
+  1. Use the Settings app to change permissions.
+  2. Recommended for command-line: `sudo gpasswd -d username group` (if it's an unauthorized admin, use `sudo` as the group.)
+  3. Advanced: `sudo nano /etc/groups`
+- Check insecure administrator passwords and change them using `sudo passwd username` or use the GUI.
 - Disable guest account (GUI)
-- Create any new groups or accounts with `sudo groupadd group` or `sudo useradd username`
+- Create any new groups or accounts with `sudo groupadd group`, `sudo useradd username`, or the Settings app.
   - For new accounts, make sure to use `sudo passwd -e username` to force a change on login.
   - Also, for adding a user to a group, use `sudo gpasswd -a username group`
 
@@ -33,7 +34,15 @@ Many services use sub-1000 UIDs if they need a user account, so _unless_ its a r
 
 ### Scriptable actions
 
+Things like disabling root logins are very important since these instantly give an attacker the highest level of permissions on a system.
 
+```bash
+sudo sed -i 's/^PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
+sudo passwd -l root
+sudo chsh -s /usr/sbin/nologin
+```
+
+## Packages and files
 
 ### Update all available packages through apt
 
@@ -66,11 +75,42 @@ Usually, common services on Linux include:
 Unless it is explicitly said in the README that it’s allowed, disable it using systemctl.
 An example command of using systemctl to disable the nginx service now would be `systemctl disable --now nginx`
 
+### Install any new, required packages
+
+You can either use the package manager GUI (i think its called synaptic) or the apt command. Not elaborating on this.
+
+### Enable automatic upgrades
+
+```bash
+sudo apt update && sudo apt upgrade
+sudo apt install unattended-upgrades
+sudo systemctl enable --now unattended-upgrades
+```
+
+## File permissions
+
 ### Check FTP permissions
 
 Last competition, we missed points on having insecure permissions for the root FTP directory (`/srv`).
 This was most likely caused because of having 777 permissions or similar. Usually, for most directories, 755 is safe, except if it's a private user folder.
 Generally if the directory is owned by a specific user, it should probably be 700.
+
+#### FTP over SSL
+
+Not directly related to file permissions, but good practice for FTP.
+All you should need to do is modify the `ssl_enable` line to equal YES.
+I'm not writing a script for this since, again, modifying existing files where the value can vary is very risky.
+
+### Check important files in /etc
+
+Make sure /etc/shadow and /etc/passwd are set to 640 and 644, respectively.
+
+```bash
+sudo chown root:root /etc/shadow
+sudo chown root:root /etc/passwd
+sudo chmod 640 /etc/shadow
+sudo chmod 644 /etc/passwd
+```
 
 <details>
 <summary>Linux permissions breakdown</summary>
@@ -100,7 +140,7 @@ This one is simple:
 
 1. Check if UFW is installed (run `ufw` in a terminal)
 2. If it isn't installed, run `sudo apt install ufw`
-3. Enable UFW by going into the system settings and enabling the firewall option or running `sudo ufw enable`
+3. Enable UFW by running `sudo ufw enable`
 
 ## sysctl related changes
 
@@ -111,16 +151,16 @@ I'ma be honest, I got no clue what these things do. But, all you gotta do is ope
 ```bash
 if [ -e /etc/sysctl.conf ]; then
 sudo sed -i 's/^net.ipv4.tcp_syncookies.*/net.ipv4.tcp_syncookies = 1/' /etc/sysctl.conf
-sudo sysctl -p
+sudo sysctl --system
 else
 sudo touch /etc/sysctl.d/47-syn-cookies.conf
 if [ -e /etc/sysctl.d ]; then
 echo 'net.ipv4.tcp_syncookies = 1' | sudo tee /etc/sysctl.d/47-syn-cookies.conf
-sudo sysctl -p
+sudo sysctl --system
 else
 sudo mkdir /etc/sysctl.d
 echo 'net.ipv4.tcp_syncookies = 1' | sudo tee /etc/sysctl.d/47-syn-cookies.conf
-sudo sysctl -p
+sudo sysctl --system
 fi
 ```
 
@@ -131,16 +171,25 @@ I still have no clue what this does lowk
 ```bash
 if [ -e /etc/sysctl.conf ]; then
 sudo sed -i 's/^kernel.randomize_va_space.*/kernel.randomize_va_space = 2/' /etc/sysctl.conf
-sudo sysctl -p
+sudo sysctl --system
 else
-sudo touch /etc/sysctl.d/38-aslr.conf
 if [ -e /etc/sysctl.d ]; then
 sudo mkdir /etc/sysctl.d
 fi
 echo 'kernel.randomize_va_space = 2' | sudo tee /etc/sysctl.d/38-aslr.conf
-sudo sysctl -p
+sudo sysctl --system
 fi
 ```
+
+### Disable IPv4 forwarding
+
+lowk im tired of writing explanations for all the scripts just ask gemini or someone smart for the explanation
+
+```bash
+sudo sed -i 's/^net.ipv4.ip_forward.*/net.ipv4.ip_forward=0/' /etc/sysctl.conf
+sudo sysctl --system
+```
+
 
 ## Password actions
 
@@ -159,12 +208,106 @@ For this one, you can simply use your favourite command line text editor for edi
 or lowk just paste the cool script thingy
 
 ```bash
-sudo sed -i 's/^PASS_MAX_DAYS.*/PASS_MAX_DAYS = 30/' /etc/login.defs
-sudo sed -i 's/^PASS_MIN_DAYS.*/PASS_MIN_DAYS = 7/' /etc/login.defs
+sudo sed -i 's/^PASS_MAX_DAYS.*=/PASS_MAX_DAYS = 30/w /tmp/sedcheck0.txt' /etc/login.defs
+sudo sed -i 's/^PASS_MIN_DAYS.*=/PASS_MIN_DAYS = 7/w /tmp/sedcheck1.txt' /etc/login.defs
+if [ -s /tmp/sedcheck0.txt ]; then
+echo 'PASS_MAX_DAYS section successfully modified!'
+else
+echo 'PASS_MAX_DAYS change failed!'
+fi
+sudo rm /tmp/sedcheck0.txt
+if [ -s /tmp/sedcheck1.txt ]; then
+echo 'PASS_MIN_DAYS section successfully modified!'
+else
+echo 'PASS_MIN_DAYS change failed!'
+fi
+sudo rm /tmp/sedcheck1.txt
 ```
 
 Also, DO NOT, and I mean **DO NOT** use `chage`. If you do and mess something up (like using it on your own account), you will be locked out, your password will not work, sudo will not work, and you will have to stop scoring. Basically if you do, you're screwed.
+Weird addition to this like a week agter i wrote this, in TR2, only the user noir needed chage to 90 days? You might want to cat the shadow file to see which ones are extremely old and do it for only those. Only try this after not being able to get anything else though.
 
 ### PAM Modules
 
 This section relates to things such as password lengths, remembering past passwords, disallowing empty passwords, and configuring account lockout policies.
+
+#### Non-scriptable actions
+
+Edit `/etc/pam.d/common-password` and find the line that says `password requisite pam_pwquality.so retry=3`. Append `minlen=10` to this line and save. No script for this one since editing existing PAM files using command line options is really sketchy... stick to nano or a text editor for this one.
+
+#### Scriptable Actions
+
+Enabling account lockout policy script (1), enabling notifications on failed attempts (2), and disable authentication of null passwords (3).
+
+```bash
+export TOWRITE=/usr/share/pam-configs/faillock
+if [ -e $TOWRITE ]; then
+echo "uhh it exists i recommend that you go in and edit this manually."
+echo "here's what you need to write:"
+echo 'Name: Enforce failed login attempt counter'
+echo 'Default: no'
+echo 'Priority: 0'
+echo 'Auth-Type: Primary'
+echo 'Auth:'
+echo '    [default=die] pam_faillock.so authfail'
+echo '    sufficient pam_faillock.so authsucc'
+elif [ -e /dev ]; then
+sudo touch $TOWRITE
+sudo chmod 777 $TOWRITE
+echo 'Name: Enforce failed login attempt counter' | sudo tee -a $TOWRITE
+echo 'Default: no' | sudo tee -a $TOWRITE
+echo 'Priority: 0' | sudo tee -a $TOWRITE
+echo 'Auth-Type: Primary' | sudo tee -a $TOWRITE
+echo 'Auth:' | sudo tee -a $TOWRITE
+echo '    [default=die] pam_faillock.so authfail' | sudo tee -a $TOWRITE
+echo '    sufficient pam_faillock.so authsucc' | sudo tee -a $TOWRITE
+sudo chmod 755 $TOWRITE
+sudo pam-auth-update
+fi
+```
+
+```bash
+export TOWRITE=/usr/share/pam-configs/faillock_notify
+if [ -e $TOWRITE ]; then
+echo "uhh it exists i recommend that you go in and edit this manually."
+echo "here's what you need to write:"
+echo 'Name: Notify on failed login attempts'
+echo 'Default: no'
+echo 'Priority: 1024'
+echo 'Auth-Type: Primary'
+echo 'Auth:'
+echo '    requisite pam_faillock.so preauth'
+elif [ -e /dev ]; then
+sudo touch $TOWRITE
+sudo chmod 777 $TOWRITE
+echo 'Name: Notify on failed login attempts' | sudo tee -a $TOWRITE
+echo 'Default: no' | sudo tee -a $TOWRITE
+echo 'Priority: 1024' | sudo tee -a $TOWRITE
+echo 'Auth-Type: Primary' | sudo tee -a $TOWRITE
+echo 'Auth:' | sudo tee -a $TOWRITE
+echo '    requisite pam_faillock.so preauth' | sudo tee -a $TOWRITE
+sudo chmod 755 $TOWRITE
+sudo pam-auth-update
+fi
+```
+
+`sudo sed -i 's/nullok//' /etc/pam.d/common-auth`
+
+## Malware and viruses
+
+### Checking open ports
+
+Usually, a backdoor or something of the sort needs a port to recieve data. You can use `sudo ss -tulpn` to check what ports are open and if any of them are malicious. Usually, malicious ones are using either:
+
+- a custom file
+- netcat, ncat, or nc
+- python
+- others..
+
+### Checking location
+
+If it's a script or command, it can be useful to see where the file or script is located. Use `ps -aef` to list all running scripts and their cmdline options. To sort through quickly, you could also pipe it into grep if you know what language or whatever its using.
+
+### Fixing these
+
+Usually, these use cron to automatically restart. You can check the crontab file at `/etc/crontab`
