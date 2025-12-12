@@ -208,8 +208,8 @@ For this one, you can simply use your favourite command line text editor for edi
 or lowk just paste the cool script thingy
 
 ```bash
-sudo sed -i 's/^PASS_MAX_DAYS.*=/PASS_MAX_DAYS = 30/w /tmp/sedcheck0.txt' /etc/login.defs
-sudo sed -i 's/^PASS_MIN_DAYS.*=/PASS_MIN_DAYS = 7/w /tmp/sedcheck1.txt' /etc/login.defs
+sudo sed -i 's/^PASS_MAX_DAYS.*/PASS_MAX_DAYS 30/w /tmp/sedcheck0.txt' /etc/login.defs
+sudo sed -i 's/^PASS_MIN_DAYS.*/PASS_MIN_DAYS 7/w /tmp/sedcheck1.txt' /etc/login.defs
 if [ -s /tmp/sedcheck0.txt ]; then
 echo 'PASS_MAX_DAYS section successfully modified!'
 else
