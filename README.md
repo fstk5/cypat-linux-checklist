@@ -186,10 +186,17 @@ fi
 lowk im tired of writing explanations for all the scripts just ask gemini or someone smart for the explanation
 
 ```bash
-sudo sed -i 's/^net.ipv4.ip_forward.*/net.ipv4.ip_forward=0/' /etc/sysctl.conf
+if [ -e /etc/sysctl.conf ]; then
+sudo sed -i 's/^net.ipv4.ip_forward.*/net.ipv4.ip_forward = 0/' /etc/sysctl.conf
 sudo sysctl --system
+else
+if [ -e /etc/sysctl.d ]; then
+sudo mkdir /etc/sysctl.d
+fi
+echo 'net.ipv4.ip_forward = 0' | sudo tee /etc/sysctl.d/02-ip-forward.conf
+sudo sysctl --system
+fi
 ```
-
 
 ## Password actions
 
@@ -208,8 +215,8 @@ For this one, you can simply use your favourite command line text editor for edi
 or lowk just paste the cool script thingy
 
 ```bash
-sudo sed -i 's/^PASS_MAX_DAYS.*/PASS_MAX_DAYS 30/w /tmp/sedcheck0.txt' /etc/login.defs
-sudo sed -i 's/^PASS_MIN_DAYS.*/PASS_MIN_DAYS 7/w /tmp/sedcheck1.txt' /etc/login.defs
+sudo sed -i 's/^PASS_MAX_DAYS.*=/PASS_MAX_DAYS 30/w /tmp/sedcheck0.txt' /etc/login.defs
+sudo sed -i 's/^PASS_MIN_DAYS.*=/PASS_MIN_DAYS 7/w /tmp/sedcheck1.txt' /etc/login.defs
 if [ -s /tmp/sedcheck0.txt ]; then
 echo 'PASS_MAX_DAYS section successfully modified!'
 else
