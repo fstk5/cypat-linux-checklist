@@ -4,17 +4,31 @@
 
 ## Other images for reference
 
-### Training round READMEs and answer keys:
+### Training round READMEs and answer keys
 
 - [CyPat 18 TR2 - Mint 21 README](https://www.uscyberpatriot.org/Pages/Readme/cp18_tr2_mint21_readme_93752gifdsw7ef.aspx)
 - [CyPat 18 TR2 - Mint 21 Answer Key](https://cp-18.s3.us-east-1.amazonaws.com/cp18_tr2/CP18_Mint21_Training2_Answer_Key.pdf)
 - [CyPat 18 TR2 - Ubuntu 22 README](https://www.uscyberpatriot.org/Pages/Readme/cp18_tr2_m_ubu22_readme_vw964wj88122.aspx)
 - [CyPat 18 TR2 - Ubuntu 22 Answer Key](https://cp-18.s3.us-east-1.amazonaws.com/cp18_tr2/CP18_Ubuntu22_Training2_Answer_Key.pdf)
 
-### CyberPatriot competition image answer keys:
+### CyberPatriot competition image answer keys
 
 - [CyPat 18 R1 Answer Key](https://github.com/fstk5/cypat-linux-checklist/blob/main/CP-18%20Round%201%20Answers%20and%20Vulnerabilities.pdf)
 - [CyPat 18 R2 Answer Key](https://github.com/fstk5/cypat-linux-checklist/blob/main/CP-18%20Round%202%20Answers%20and%20Vulnerabilities.pdf)
+
+## One-liner Mega Script
+
+!!WARNING!! This has been tested on practice images, however, errors may occur. This is purely here for future Patriots (and any cypatters who want to contribute) to further extend and improve. If you want to run it, then run `sudo -s` in between the two code snippets.
+
+```bash
+sudo apt install curl
+curl -sSL 'https://raw.githubusercontent.com/fstk5/cypat-linux-checklist/refs/heads/main/superdupermegascript.sh' -o superdupermegascript.sh
+chmod +x superdupermegascript.sh
+```
+
+```bash
+./superdupermegascript.sh
+```
 
 ## User Account Actions
 
