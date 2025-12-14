@@ -44,7 +44,6 @@ if [ -e /etc/sysctl.conf ]; then
 sed -i 's/^net.ipv4.ip_forward.*/net.ipv4.ip_forward = 0/' /etc/sysctl.conf
 sysctl --system
 elif [ -e /etc/sysctl.d ]; then
-mkdir /etc/sysctl.d
 echo 'net.ipv4.ip_forward = 0' | tee /etc/sysctl.d/02-ip-forward.conf
 sysctl --system
 else
