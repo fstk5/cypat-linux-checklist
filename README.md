@@ -1,4 +1,6 @@
-# Linux Checklist
+# Patrick Henry High School Patriots' Linux Checklist
+
+![Logo of Patrick Henry High School](/phhs_logo.png)
 
 ## Other images for reference
 
