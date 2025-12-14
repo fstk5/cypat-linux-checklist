@@ -128,3 +128,5 @@ pam-auth-update
 fi
 
 sed -i 's/nullok//' /etc/pam.d/common-auth
+
+snap refresh

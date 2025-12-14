@@ -62,7 +62,7 @@ sudo chsh -s /usr/sbin/nologin
 
 ### Update all available packages through apt
 
-- Usually, `sudo apt update && sudo apt upgrade` is sufficient for this.
+- Usually, `sudo apt update && sudo apt upgrade && sudo snap refresh` is sufficient for this.
 - Updates all package lists and gets new package versions from the set mirror.
 
 ### Search for unauthorized files
@@ -93,7 +93,7 @@ An example command of using systemctl to disable the nginx service now would be 
 
 ### Install any new, required packages
 
-You can either use the package manager GUI (i think its called synaptic) or the apt command. Not elaborating on this.
+You can either use the package manager GUI (i think its called synaptic) or the apt command. If the system is Ubuntu, you can also run `sudo snap refresh` to update any snap packages.
 
 ### Enable automatic upgrades
 
