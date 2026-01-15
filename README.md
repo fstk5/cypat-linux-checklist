@@ -2,6 +2,11 @@
 
 ![Logo of Patrick Henry High School](/phhs_logo.png)
 
+## talky talk talk
+
+big checklist do lot work
+if any of y'all are from a different cypat team feel free to use this, just credit us ig
+
 ## Other images for reference
 
 ### Training round READMEs and answer keys
@@ -21,6 +26,7 @@
 !!WARNING!! This has been tested on practice images, however, errors may occur. This is purely here for future Patriots (and any cypatters who want to contribute) to further extend and improve. If you want to run it, then run `sudo -s` in between the two code snippets.
 
 ```bash
+sudo apt update
 sudo apt install curl
 curl -sSL 'https://raw.githubusercontent.com/fstk5/cypat-linux-checklist/refs/heads/main/superdupermegascript.sh' -o superdupermegascript.sh
 chmod +x superdupermegascript.sh
@@ -80,8 +86,8 @@ Before altering the directory or files, read the README file and/or forensic que
 
 Usually, common services on Linux include:
 
-- nginx (Web server)
-- shd (SSH Daemon/Server)
+- nginx/apache (Web server)
+- sshd (SSH Daemon/Server)
 - vsftpd (FTP Server)
 - telnet (Telnet server)
 - cups (CUPS print server)
@@ -98,7 +104,7 @@ You can either use the package manager GUI (i think its called synaptic) or the 
 ### Enable automatic upgrades
 
 ```bash
-sudo apt update && sudo apt upgrade
+sudo apt update && sudo apt full-upgrade -y
 sudo apt install unattended-upgrades
 sudo systemctl enable --now unattended-upgrades
 ```
