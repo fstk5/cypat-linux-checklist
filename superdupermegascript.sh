@@ -786,7 +786,6 @@ do
   sudo find /home -name *.$suffix
 done
 
-sudo apt-get -y install vsftpd
 # Disable anonymous uploads
 sudo sed -i '/^anon_upload_enable/ c\anon_upload_enable no' /etc/vsftpd.conf
 sudo sed -i '/^anonymous_enable/ c\anonymous_enable=NO' /etc/vsftpd.conf
