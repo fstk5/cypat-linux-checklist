@@ -16,7 +16,7 @@ sed -i 's/^PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
 passwd -l root
 chsh -s /usr/sbin/nologin root
 
-apt update && apt upgrade && apt install unattended-upgrades
+apt update && apt full-upgrade -y && apt install unattended-upgrades
 systemctl enable --now unattended-upgrades
 
 chown root:root /etc/shadow
@@ -165,9 +165,6 @@ echo "15" > /proc/sys/net/ipv4/tcp_reordering
 
 echo "cubic" > /proc/sys/net/ipv4/tcp_congestion_control
 
-
-
-
 echo "0" > /proc/sys/fs/suid_dumpable
 
 echo "1" > /proc/sys/kernel/exec-shield
@@ -199,8 +196,6 @@ echo "5000 65535" > /proc/sys/net/ipv4/ip_local_port_range
 
 echo "1" > /proc/sys/net/ipv6/conf/all/disable_ipv6
 echo "1" > /proc/sys/net/ipv6/conf/default/disable_ipv6
-
-
 
 echo "7930900" > /proc/sys/fs/file-max
 
@@ -236,7 +231,7 @@ unattended_upg() {
 disable_root() {
     passwd -l root
     # for any reason if you need to re-enable it:
-    # sudo passwd -l root
+    # passwd -l root
 }
 
 purge_telnet() {
@@ -293,7 +288,7 @@ harden_ssh_brute() {
 }
 
 harden_ssh(){
-    sudo sh -c 'echo "PermitRootLogin no" >> /etc/ssh/ssh_config'
+    sh -c 'echo "PermitRootLogin no" >> /etc/ssh/ssh_config'
 }
 
 logwatch_reporter() {
@@ -419,7 +414,7 @@ startFun()
 	aptUpFun
 	aptInstFun
 	deleteFileFun
-	firewallFun
+	# firewallFun
 	sysCtlFun
 	scanFun
 	printf "\033[1;31mDone!\033[0m\n"
@@ -436,7 +431,7 @@ cont(){
 PasswdFun(){
 	printf "\033[1;31mChanging Root's Password..\033[0m\n"
 	#--------- Change Root Password ----------------
-	passwd
+	passwd -l root
 	echo "Please change other user's passwords too"
 	cont
 }
@@ -775,20 +770,20 @@ repoFun(){
 startFun
 
 # Malware
-sudo apt-get -y purge hydra*
-sudo apt-get -y purge john*
-sudo apt-get -y purge nikto*
-sudo apt-get -y purge netcat*
+apt-get -y purge hydra*
+apt-get -y purge john*
+apt-get -y purge nikto*
+apt-get -y purge netcat*
 
 # Media Files
 for suffix in mp3 txt wav wma aac mp4 mov avi gif jpg png bmp img exe msi bat sh
 do
-  sudo find /home -name *.$suffix
+  find /home -name *.$suffix
 done
 
 # Disable anonymous uploads
-sudo sed -i '/^anon_upload_enable/ c\anon_upload_enable no' /etc/vsftpd.conf
-sudo sed -i '/^anonymous_enable/ c\anonymous_enable=NO' /etc/vsftpd.conf
+sed -i '/^anon_upload_enable/ c\anon_upload_enable no' /etc/vsftpd.conf
+sed -i '/^anonymous_enable/ c\anonymous_enable=NO' /etc/vsftpd.conf
 # FTP user directories use chroot
-sudo sed -i '/^chroot_local_user/ c\chroot_local_user=YES' /etc/vsftpd.conf
-sudo service vsftpd restart
+sed -i '/^chroot_local_user/ c\chroot_local_user=YES' /etc/vsftpd.conf
+systemctl restart vsftpd

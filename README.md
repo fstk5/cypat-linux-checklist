@@ -50,6 +50,7 @@ chmod +x superdupermegascript.sh
 - Create any new groups or accounts with `sudo groupadd group`, `sudo useradd username`, or the Settings app.
   - For new accounts, make sure to use `sudo passwd -e username` to force a change on login.
   - Also, for adding a user to a group, use `sudo gpasswd -a username group`
+  - Make sure to run `visudo` to make sure that there are no unauthorized groups, users, or settings defined in the `/etc/sudoers` file.
 
 Weird subnote for this, there _could_ be a regular user with a sub-1000 UID, if this happens, you should go ask someone smart if this needs to be fixed.
 Many services use sub-1000 UIDs if they need a user account, so _unless_ its a regular user account (like one somebody actually uses), you're perfectly fine.
